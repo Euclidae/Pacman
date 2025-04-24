@@ -16,15 +16,15 @@ class Animation{
       float clip_offset;
 
     public:
-  
 
-      Animation(std::string file, SDL_Renderer* rend, mat::vector2i c_s, mat::vector2f pos);
+      Animation() = default;
+      Animation(std::string file, SDL_Renderer* rend, mat::vector2f c_s, mat::vector2f pos);
       void move(mat::vector2f vec);
       void move(mat::vector2i vec);
-      void change_sprite(bool trigger);
+      void animate(float time);
+      void change_sprite(Direction dir);
       void draw_entity(SDL_FRect& dst);
       SDL_FRect& get_entity(){
-          return dst;
       }
       ~Animation();
 

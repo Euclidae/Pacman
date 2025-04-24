@@ -5,6 +5,7 @@
 #include <iostream>
 #include "globals.hpp"
 #include "map.hpp"
+
 class Game{
     private:
         int screen_width, screen_height = 0;

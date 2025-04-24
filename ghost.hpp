@@ -2,7 +2,7 @@
 #include "globals.hpp"
 #include "pacman.hpp"
 #include "map.hpp"
-
+#include "animation.hpp"
 class Ghost: public Entity{
     private:
         mat::vector2f position;
