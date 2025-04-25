@@ -1,30 +1,28 @@
-#pragma once
+#ifndef GLOBALS_HPP
+#define GLOBALS_HPP
 #include <cmath>
 #include <string>
 #define SCREEN_WIDTH 608
-#define SCREEN_HEIGHT 673
-#define FPS 60
+#define SCREEN_HEIGHT 672
+#define FPS 30
 #define FRAME_TIME 1000/FPS
 #define ROWS 21
 #define COLUMNS 19
-
-#define RED_GHOST_SPRITE "pacman sprites/red sprites"
-#define BLUE_GHOST_SPRITE "pacman sprites/blue sprites"
-#define ORANGE_GHOST_SPRITE "pacman sprites/orange sprites"
-#define PINK_GHOST_SPRITE "pacman sprites/pink sprites"
+#define CELL_SIZE 32
 
 namespace mat {
     struct vector2f {
-        float x, y;
+        float x = 0.0f, y = 0.0f;
 
-        void operator = (const vector2f& vec2){
+        vector2f& operator = (const vector2f& vec2){
             x = vec2.x;
             y = vec2.y;
+            return *this;
         }
     };
 
     struct vector2i {
-        int x, y;
+        int x = 0, y = 0;
     };
 }
 
@@ -55,3 +53,4 @@ enum Ghost_Mode{
   FLEE,
   HUNT
 };
+#endif

@@ -1,10 +1,10 @@
 #pragma once
 #include "globals.hpp"
-#include <SDL3_image/SDL_image.h>
+#include <SDL3/SDL_image.h>
 class Animation{
     private:
       std::string filename;
-      mat::vector2i clip_size;
+      mat::vector2f clip_size;
       mat::vector2i dst_size;
       mat::vector2i movement;
       mat::vector2f ent_position;

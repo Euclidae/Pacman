@@ -5,7 +5,7 @@
 #include <iostream>
 #include "globals.hpp"
 #include "map.hpp"
-
+#include "ghost.hpp"
 class Game{
     private:
         int screen_width, screen_height = 0;
@@ -14,6 +14,10 @@ class Game{
         SDL_Event event;
         bool isRunning;
         Map map;
+        Ghost r_ghost;
+        Ghost b_ghost;
+        Ghost p_ghost;
+        Ghost o_ghost;
 
     public:
         explicit Game(const char* title,int x_size, int y_size);
