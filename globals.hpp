@@ -2,9 +2,10 @@
 #define GLOBALS_HPP
 #include <cmath>
 #include <string>
+#include <iostream>
 #define SCREEN_WIDTH 608
 #define SCREEN_HEIGHT 672
-#define FPS 30
+#define FPS 60
 #define FRAME_TIME 1000/FPS
 #define ROWS 21
 #define COLUMNS 19
@@ -53,4 +54,8 @@ enum Ghost_Mode{
   FLEE,
   HUNT
 };
+
+
+
+
 #endif

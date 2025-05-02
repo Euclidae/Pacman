@@ -4,6 +4,7 @@
 class Animation{
     private:
       std::string filename;
+      bool is_changed;
       mat::vector2f clip_size;
       mat::vector2i dst_size;
       mat::vector2i movement;
@@ -21,10 +22,11 @@ class Animation{
       Animation(std::string file, SDL_Renderer* rend, mat::vector2f c_s, mat::vector2f pos);
       void move(mat::vector2f vec);
       void move(mat::vector2i vec);
-      void animate(float time);
+      void animate(float count);
       void change_sprite(Direction dir);
       void draw_entity(SDL_FRect& dst);
       SDL_FRect& get_entity(){
+          return clip;
       }
       ~Animation();
 

@@ -6,6 +6,8 @@
 #include "globals.hpp"
 #include "map.hpp"
 #include "ghost.hpp"
+#include "pacman.hpp"
+
 class Game{
     private:
         int screen_width, screen_height = 0;
@@ -18,6 +20,9 @@ class Game{
         Ghost b_ghost;
         Ghost p_ghost;
         Ghost o_ghost;
+        Pacman pacman;
+        float count;
+        bool change_sprite;
 
     public:
         explicit Game(const char* title,int x_size, int y_size);

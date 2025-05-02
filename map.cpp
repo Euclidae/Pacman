@@ -1,8 +1,11 @@
 #include "map.hpp"
 #include "globals.hpp"
+#include <SDL3/SDL_oldnames.h>
+
+
 
 Map::Map(std::string mapName) noexcept{
-    cellsize.x = SCREEN_WIDTH/COLUMNS;//19 columns
+    cellsize.x = (float)SCREEN_WIDTH/COLUMNS;//19 columns
     cellsize.y = (float)SCREEN_HEIGHT/ROWS;
 
     wall = {0,0,cellsize.x,cellsize.y};
@@ -37,6 +40,12 @@ Map::Map(std::string mapName) noexcept{
            else if(buffer[i] == 'p'){
                pink_pos.x = x_offset;
                pink_pos.y = y_offset;
+           }else{
+               SDL_Point point;
+               point.x = x_offset - (CELL_SIZE/2);
+               point.y = y_offset - (CELL_SIZE/2);
+               pellets.push_back(point);
+
            }
            x_offset += cellsize.x;
        }
@@ -84,3 +93,23 @@ mat::vector2f& Map::getPinkGhost() {return pink_pos;}
 mat::vector2f& Map::getOrangeGhost() {return orange_pos;}
 void Map::getRedGhostX(mat::vector2f& variant){variant = red_pos;}
         //TODO return entity positions
+
+bool Map::isWallAt(float x, float y){
+    for(auto& wall : map){
+            if(wall.x <= x && x <= wall.x + wall.w && wall.y <= y && y <= wall.y + wall.h)
+                return true;
+        }
+    return false;
+}
+
+bool Map::isWallAt(SDL_FRect& rect){
+    for(auto& wall : map){
+        if(SDL_HasRectIntersectionFloat(&wall,&rect))
+            return true;
+    }
+    return false;
+}
+
+std::vector<SDL_Point>& Map::get_pellets(){
+    return pellets;
+}

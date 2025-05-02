@@ -17,12 +17,18 @@ Animation::Animation(std::string file, SDL_Renderer* rend, mat::vector2f c_s, ma
 
 }
 
-void Animation::animate(float time){
+void Animation::animate(float count){
 //TODO figure out what the hell I want to do with time.
-    if(floor(time/FPS) == 2){
-        clip.x += 32;
-    }else{
-        clip.x = 0;
+//Control animation with some kind of boolean or something better
+    if(count >= FPS/2 && count < FPS){
+        if(clip.x < 32){
+            clip.x += 32;
+        };
+        std::cout << "\033[32mWorks!\033[00m\n";
+    }else if(count > 0 && count < FPS/2){
+        if(clip.x > 0){
+            clip.x = 0;
+        }
     }
 }
 void Animation::change_sprite(Direction dir){
