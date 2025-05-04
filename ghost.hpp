@@ -31,7 +31,7 @@ class Ghost: public Entity{
       Ghost() = default;
       Ghost(std::string image, SDL_Renderer* renderer, mat::vector2f pos, mat::vector2f move_speed, Direction def, std::string n);
       void draw(float time);
-      void update(float delta_time, Map& map);
+      void update(float delta_time, Map& map, Pacman& pacman);
       void change_mode();
       void flee(bool flee = false);
       void get_pos(mat::vector2f& new_pos);

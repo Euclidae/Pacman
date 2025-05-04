@@ -36,21 +36,21 @@ void Game::processInput(){
             switch(event.key.scancode){
                 case SDL_SCANCODE_LEFT:
                     //TODO
-                    pacman.change_direction(Direction::LEFT);
+                    pacman.change_direction(Direction::LEFT, map);
                     break;
                 case SDL_SCANCODE_RIGHT:
                     //TODO
-                    pacman.change_direction(Direction::RIGHT);
+                    pacman.change_direction(Direction::RIGHT, map);
                     break;
 
                 case SDL_SCANCODE_UP:
                     //TODO
-                    pacman.change_direction(Direction::UP);
+                    pacman.change_direction(Direction::UP, map);
                     break;
 
                 case SDL_SCANCODE_DOWN:
                     //TODO
-                    pacman.change_direction(Direction::DOWN);
+                    pacman.change_direction(Direction::DOWN, map);
                     break;
 
                 case SDL_SCANCODE_ESCAPE:
@@ -68,11 +68,15 @@ void Game::processInput(){
 void Game::update(float dt){
     //TODO
     count++; //counts frame. change animation every FPS/2;
-    r_ghost.update(dt, map);
     pacman.update(dt,map);
-    b_ghost.update(dt, map);
-    p_ghost.update(dt, map);
-    o_ghost.update(dt, map);
+    r_ghost.update(dt, map,pacman);
+    b_ghost.update(dt, map,pacman);
+    p_ghost.update(dt, map,pacman);
+    o_ghost.update(dt, map,pacman);
+    if(!pacman.is_pacman_ok()){
+        isRunning = false;
+        std::cout << "\033[033mPacman is dead\n";
+    }
     if(count == FPS){
         count = 0;
     }
@@ -86,12 +90,11 @@ void Game::draw(){
     SDL_RenderClear(renderer);
     map.drawMap(renderer);
     map.draw_pellets(renderer);
-    SDL_SetRenderDrawColor(renderer,0, 219,219,255);
+    pacman.draw(count);
     r_ghost.draw(count);
     b_ghost.draw(count);
     p_ghost.draw(count);
     o_ghost.draw(count);
-    pacman.draw(count);
     SDL_RenderPresent(renderer);
 }
 

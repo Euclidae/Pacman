@@ -1,5 +1,7 @@
 #include "ghost.hpp"
 #include "globals.hpp"
+#include "pacman.hpp"
+#include <SDL3/SDL_rect.h>
 
 // Create a single global random number generator to avoid reseeding problems
 static std::mt19937 global_generator(static_cast<unsigned int>(std::time(nullptr)));
@@ -25,9 +27,9 @@ Ghost::Ghost(std::string image, SDL_Renderer* renderer, mat::vector2f pos, mat::
     destination = {position.x, position.y, (float)SCREEN_WIDTH/COLUMNS - 2, (float)SCREEN_HEIGHT/ROWS - 2};
     direction = def;
     name = n;
-    vessel = destination; // Initialize vessel to avoid undefined behavior
+    vessel = destination;
 
-    // Initialize with a valid direction
+    // Initialize with a valid direction. We really don't want the weirdness from earlier
     possible_directions.push_back(def);
 }
 
@@ -38,11 +40,15 @@ void Ghost::draw(float time) {
 }
 
 void Ghost::change_mode() {
-    // Implementation for mode changes
+    //TODO: Implementation for mode changes
 }
 
 void Ghost::detect_collision(Pacman& pacman) {
-    // Pacman collision detection
+    //TODO Pacman collision detection
+    bool alive = false;
+    if(SDL_HasRectIntersectionFloat(&pacman.get_pacman(), &destination)){
+        pacman.kill_pacman(alive);
+    }
 }
 
 bool Ghost::detect_collision(Map& map, SDL_FRect& spider) {
@@ -113,46 +119,46 @@ void Ghost::change_direction(Map& map) {
     possible_directions.clear();
 }
 
-// Recommended changes to fix ghost movement issues
+// -------------------------------------------------------------------------------------------\\
 
-void Ghost::update(float delta_time, Map& map) {
+void Ghost::update(float delta_time, Map& map, Pacman& pacman) {
     // Debug movement speed
     std::cout << name << " Move vector x: " << move_speed.x << std::endl;
     std::cout << name << " Move vector y: " << move_speed.y << std::endl;
 
-    SDL_FRect spider = destination;
+    SDL_FRect spider = destination; //spider is based on the concept of web spidering. it just stores state of destination and changes it to figure what's happneing>
     float x_move_speed = (move_speed.x * delta_time);
     float y_move_speed = (move_speed.y * delta_time);
 
     // Apply movement based on current direction
     switch(direction) {
         case UP:
-            std::cout << name << " goes up" << std::endl;
+            std::cout << name << " goes up\n";
             spider.y -= y_move_speed;
             break;
         case DOWN:
-            std::cout << name << " goes down" << std::endl;
+            std::cout << name << " goes down\n";
             spider.y += y_move_speed;
             break;
         case LEFT:
-            std::cout << name << " goes left" << std::endl;
+            std::cout << name << " goes left\n";
             spider.x -= x_move_speed;
             break;
         case RIGHT:
-            std::cout << name << " goes right" << std::endl;
+            std::cout << name << " goes right\n";
             spider.x += x_move_speed;
             break;
     }
 
     // Check if we're at a junction (allow a small error margin for alignment)
     bool at_junction = false;
-    const float GRID_ALIGN_THRESHOLD = 2.0f;  // Pixels of error margin
-
-    // Check if we're aligned to the grid (proper junction detection)
+    const float GRID_ALIGN_THRESHOLD = 2.0f;
+    // making sure we're aligned to the grid (proper junction detection)
     bool aligned_to_grid = false;
     float grid_x = std::round(destination.x / CELL_SIZE) * CELL_SIZE;
     float grid_y = std::round(destination.y / CELL_SIZE) * CELL_SIZE;
 
+    //just making sure we don't pixel collision or something.
     if (std::abs(destination.x - grid_x) < GRID_ALIGN_THRESHOLD &&
         std::abs(destination.y - grid_y) < GRID_ALIGN_THRESHOLD) {
         aligned_to_grid = true;
@@ -160,21 +166,20 @@ void Ghost::update(float delta_time, Map& map) {
         // Get possible directions at this location
         get_possible_directions(map, destination, delta_time);
 
-        // If we have more than one option (excluding going backwards), we're at a junction
+        // If we have more than one option (excluding going backwards cuz duh??), we're at a junction
         if (possible_directions.size() >= 2) {
             at_junction = true;
         }
     }
 
+    //------------------------------------------------------------------------------------------------
     // Handle collision with the map
     if(detect_collision(map, spider)) {
-        spider = destination; // Reset to original position
+        spider = destination;
 
-        // Get new possible directions and change
         get_possible_directions(map, spider, delta_time);
         change_direction(map);
 
-        // Apply the new direction
         switch(direction) {
             case UP:
                 spider.y -= y_move_speed;
@@ -197,17 +202,11 @@ void Ghost::update(float delta_time, Map& map) {
     } else {
         // If we're at a junction, consider changing direction
         if (at_junction) {
-            // Consistent junction handling for all ghosts
-            // Blue and orange ghosts have increased probability to take turns
-            int change_probability = 60; // Default 30% chance to turn at junction
+            int change_probability = 60; // Default 60% chance to turn at junction
 
-            // For blue and orange, increase turning probability when headed in their default directions
-            if ((name == "blue" && direction == RIGHT) ||
-                (name == "orange" && direction == LEFT)) {
-                change_probability = 60; // 60% chance to change at junction
-            }
-
-            // Check if we should change direction
+            //added manual code for blue and orange but they seem fine so I removed it????
+            //TODO fix that weirdness where they go out of bounds and somehow emerge in one of the dead
+            //zones up there. Like, wtf man? Lmao
             if (random_between(0, 99) < change_probability) {
                 change_direction(map);
 
@@ -231,7 +230,9 @@ void Ghost::update(float delta_time, Map& map) {
         }
     }
 
-    // Handle screen wrapping correctly
+    //------------------------------------------------------------------------------------------------
+
+    // Handle screen wrapping correctly. Still feel like an idio for messing this up
     if(spider.x > SCREEN_WIDTH) {
         spider.x = 0 - spider.w;
     }
@@ -247,6 +248,7 @@ void Ghost::update(float delta_time, Map& map) {
 
     // Update ghost position
     destination = spider;
+    detect_collision(pacman);
 }
 
 void Ghost::get_possible_directions(Map& map, SDL_FRect& spider, float delta_time) {

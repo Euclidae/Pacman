@@ -40,12 +40,13 @@ Map::Map(std::string mapName) noexcept{
            else if(buffer[i] == 'p'){
                pink_pos.x = x_offset;
                pink_pos.y = y_offset;
-           }else{
-               SDL_Point point;
-               point.x = x_offset - (CELL_SIZE/2);
-               point.y = y_offset - (CELL_SIZE/2);
-               pellets.push_back(point);
+           }
 
+           else{
+                    SDL_Point point;
+                    point.x = x_offset - (CELL_SIZE/2);
+                    point.y = y_offset - (CELL_SIZE/2);
+                    pellets.push_back(point);
            }
            x_offset += cellsize.x;
        }
