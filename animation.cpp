@@ -54,7 +54,7 @@ void Animation::change_sprite(Direction dir){
 
 
 void Animation::draw_entity(SDL_FRect& dst){
-    ent_texture = IMG_LoadTexture(renderer, filename.c_str()); // this  is a mess. this shouldn't be here but when I remove it, pacman performs kage bunshin, lol.
+    if(ent_texture == nullptr)ent_texture = IMG_LoadTexture(renderer, filename.c_str()); // this  is a mess. this shouldn't be here but when I remove it, pacman performs kage bunshin, lol.
     SDL_RenderTexture(renderer,ent_texture,&clip,&dst);
 }
 
