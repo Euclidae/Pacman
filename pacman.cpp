@@ -18,6 +18,9 @@ Pacman::Pacman(std::string im, Direction dir, mat::vector2f pos, mat::vector2f d
     destination.h = CELL_SIZE - 4;
     destination.x = position.x;
     destination.y = position.y;
+    lives = 3;
+    is_powered = false;
+    power_pellet_timer = 0;
 }
 
 SDL_FRect& Pacman::get_pacman(){
@@ -41,7 +44,7 @@ bool Pacman::detect_collision(Map& map, SDL_FRect& spider) {
     return false;
 }
 
-bool Pacman::remove_pellets(std::vector<SDL_Point>& pellets, SDL_FRect& spider) {
+bool Pacman::remove_pellets(std::vector<SDL_Point>& pellets, SDL_FRect& spider, int& score) {
     for (auto it = pellets.begin(); it != pellets.end();) {
         // Compute distances between pellet center and pacman center
         float pacmanCenterX = spider.x + (spider.w / 2);
@@ -58,6 +61,7 @@ bool Pacman::remove_pellets(std::vector<SDL_Point>& pellets, SDL_FRect& spider) 
         // If distance is less than collision radius, remove the pellet
         if (distance < (spider.w / 2)) {
             it = pellets.erase(it);
+            ++score;
             std::cout << "Pellet eaten!" << std::endl;
             return true;
         } else {
@@ -67,7 +71,7 @@ bool Pacman::remove_pellets(std::vector<SDL_Point>& pellets, SDL_FRect& spider) 
     return false;
 }
 
-void Pacman::update(float delta_time, Map& map){
+void Pacman::update(float delta_time, Map& map, int& score){
     float x_move_speed = (move_speed.x * delta_time);
     float y_move_speed = (move_speed.y * delta_time);
     SDL_FRect spider = destination;
@@ -91,12 +95,25 @@ void Pacman::update(float delta_time, Map& map){
     }
 
     if(detect_collision(map, spider)) spider = destination;
-    remove_pellets(map.get_pellets(), spider);
+    remove_pellets(map.get_pellets(), spider, score);
+    if(remove_power_pellets(map.get_power_pellets(), spider)){
+        is_powered = true;
+        power_pellet_timer = 300; // 5 seconds at 60 FPS
+    }
+
+    // Handle power pellet timer
+    if(is_powered && power_pellet_timer > 0){
+        power_pellet_timer--;
+        if(power_pellet_timer <= 0){
+            is_powered = false;
+        }
+    }
+
     destination = spider;
 }
 
 void Pacman::kill_pacman(bool& death){
-    is_alive = false;
+    lose_life();
 }
 
 bool Pacman::detect_collision(SDL_FRect& entity){
@@ -134,4 +151,47 @@ void Pacman::change_direction(Direction dir,Map& map){
         //TODO stop pacman from facing to the left if there is wall on left, for example
         direction = dir;
     }
+}
+
+bool Pacman::remove_power_pellets(std::vector<SDL_Point>& power_pellets, SDL_FRect& spider) {
+    for (auto it = power_pellets.begin(); it != power_pellets.end();) {
+        // Compute distances between power pellet center and pacman center
+        float pacmanCenterX = spider.x + (spider.w / 2);
+        float pacmanCenterY = spider.y + (spider.h / 2);
+        float pelletX = static_cast<float>(it->x);
+        float pelletY = static_cast<float>(it->y);
+
+        // Use distance-based collision with a reasonable radius
+        float distance = std::sqrt(
+            std::pow(pacmanCenterX - pelletX, 2) +
+            std::pow(pacmanCenterY - pelletY, 2)
+        );
+
+        // If distance is less than collision radius, remove the power pellet
+        if (distance < (spider.w / 2) + 5) {
+            it = power_pellets.erase(it);
+            std::cout << "Power pellet eaten!" << std::endl;
+            return true;
+        } else {
+            ++it;
+        }
+    }
+    return false;
+}
+
+void Pacman::lose_life(){
+    lives--;
+    if(lives <= 0){
+        is_alive = false;
+    }
+}
+
+void Pacman::reset_position(mat::vector2f spawn_pos){
+    position = spawn_pos;
+    destination.x = position.x;
+    destination.y = position.y;
+}
+
+void Pacman::restore_alive_status(){
+    is_alive = true;
 }

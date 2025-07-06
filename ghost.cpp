@@ -28,6 +28,7 @@ Ghost::Ghost(std::string image, SDL_Renderer* renderer, mat::vector2f pos, mat::
     direction = def;
     name = n;
     vessel = destination;
+    is_vulnerable = false;
 
     // Initialize with a valid direction. We really don't want the weirdness from earlier
     possible_directions.push_back(def);
@@ -47,7 +48,17 @@ void Ghost::detect_collision(Pacman& pacman) {
     //TODO Pacman collision detection
     bool alive = false;
     if(SDL_HasRectIntersectionFloat(&pacman.get_pacman(), &destination)){
-        pacman.kill_pacman(alive);
+        if(is_vulnerable && pacman.is_powered_up()){
+            // Ghost is eaten - reset to spawn position
+            std::cout << name << " was eaten by powered up Pacman!\n";
+            // Reset ghost position to spawn (you might want to add a spawn position member)
+            destination.x = position.x;
+            destination.y = position.y;
+            is_vulnerable = false;
+        } else if(!pacman.is_powered_up()) {
+            // Pacman dies only if not powered up
+            pacman.kill_pacman(alive);
+        }
     }
 }
 
@@ -119,9 +130,12 @@ void Ghost::change_direction(Map& map) {
     possible_directions.clear();
 }
 
-// -------------------------------------------------------------------------------------------\\
+
 
 void Ghost::update(float delta_time, Map& map, Pacman& pacman) {
+    
+    is_vulnerable = pacman.is_powered_up();
+    
     // Debug movement speed
     std::cout << name << " Move vector x: " << move_speed.x << std::endl;
     std::cout << name << " Move vector y: " << move_speed.y << std::endl;
@@ -172,8 +186,7 @@ void Ghost::update(float delta_time, Map& map, Pacman& pacman) {
         }
     }
 
-    //------------------------------------------------------------------------------------------------
-    // Handle collision with the map
+    
     if(detect_collision(map, spider)) {
         spider = destination;
 
@@ -230,8 +243,7 @@ void Ghost::update(float delta_time, Map& map, Pacman& pacman) {
         }
     }
 
-    //------------------------------------------------------------------------------------------------
-
+    
     // Handle screen wrapping correctly. Still feel like an idio for messing this up
     if(spider.x > SCREEN_WIDTH) {
         spider.x = 0 - spider.w;
@@ -345,4 +357,12 @@ void Ghost::get_possible_directions(Map& map, SDL_FRect& spider, float delta_tim
             std::cout << name << " is completely trapped! Maintaining current direction\n";
         }
     }
+}
+
+void Ghost::set_vulnerable(bool vulnerable) {
+    is_vulnerable = vulnerable;
+}
+
+bool Ghost::get_vulnerable() const {
+    return is_vulnerable;
 }
