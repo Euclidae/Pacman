@@ -2,6 +2,7 @@
 #ifdef _WIN32
 #define SDL_MAIN_HANDLED
 #endif
+
 #include <iostream>
 #include <string>
 #include <regex>
