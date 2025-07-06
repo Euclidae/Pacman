@@ -22,6 +22,7 @@ class Ghost: public Entity{
         Direction direction;
         float last_direction_change;
         std::vector<Direction> possible_directions;
+        bool is_vulnerable;
         void change_direction(Map& map);
         void get_possible_directions(Map& map, SDL_FRect& spider,float delta_time);
         void detect_collision(Pacman& pacman);
@@ -35,6 +36,8 @@ class Ghost: public Entity{
       void change_mode();
       void flee(bool flee = false);
       void get_pos(mat::vector2f& new_pos);
+      void set_vulnerable(bool vulnerable);
+      bool get_vulnerable() const;
 
 
       inline void move(){

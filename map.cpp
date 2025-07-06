@@ -42,10 +42,17 @@ Map::Map(std::string mapName) noexcept{
                pink_pos.y = y_offset;
            }
 
+           else if(buffer[i] == 'S'){
+               SDL_Point power_point;
+               power_point.x = x_offset + (CELL_SIZE/2);
+               power_point.y = y_offset + (CELL_SIZE/2);
+               power_pellets.push_back(power_point);
+           }
+
            else{
                     SDL_Point point;
-                    point.x = x_offset - (CELL_SIZE/2);
-                    point.y = y_offset - (CELL_SIZE/2);
+                    point.x = x_offset + (CELL_SIZE/2);
+                    point.y = y_offset + (CELL_SIZE/2);
                     pellets.push_back(point);
            }
            x_offset += cellsize.x;
@@ -113,4 +120,8 @@ bool Map::isWallAt(SDL_FRect& rect){
 
 std::vector<SDL_Point>& Map::get_pellets(){
     return pellets;
+}
+
+std::vector<SDL_Point>& Map::get_power_pellets(){
+    return power_pellets;
 }

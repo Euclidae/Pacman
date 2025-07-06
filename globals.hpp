@@ -55,6 +55,12 @@ enum Ghost_Mode{
   HUNT
 };
 
+enum Game_State{
+  MENU,
+  PLAYING,
+  GAME_OVER
+};
+
 
 
 

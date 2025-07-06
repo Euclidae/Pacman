@@ -23,12 +23,23 @@ class Game{
         Pacman pacman;
         float count;
         bool change_sprite;
+        Game_State game_state;
+        int lives;
+        int score;
+        bool show_menu;
+        SDL_Color color;
+        SDL_Surface* text_surface = nullptr;
+        SDL_Texture* text_texture = nullptr;
 
     public:
-        explicit Game(const char* title,int x_size, int y_size);
+        explicit Game(const char* title,int x_size, int y_size, char* map_name = "assets/maps/map.txt");
         void processInput();
         void update(float dt);
         void draw();
         void loop();
+        void drawMenu();
+        void drawGameOver();
+        void drawHUD();
+        void resetGame();
         ~Game();
 };
